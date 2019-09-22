@@ -1,0 +1,502 @@
+/**************************************************************************\
+$VER: BBSLink Menu, v1.0.1 (Sep-22-2019) by k1ds3ns4t10n of -X-caliber BBS
+\**************************************************************************/
+options results;signal on SYNTAX;signal on ERROR;signal on IOERR
+a=sourceline(2);parse var a . " " title ", " ver " (" vdate ") by " author " " .
+tr=transmit;se=sendstring;gc=getchar;gu=getuser;gs=getscratch;mg=maygetchar
+bbsidentify bbs;cv=left(word(result,3),4);cnet4=(datatype(cv,"n")=1&cv>"4.25")
+bbsidentify name;g.bbsName=strip(result, 'B');esc="1b5b"x;cty="19"x;ctq="11"x
+rs="rexxsupport.library";if ~show("l",rs) then if ~addlib(rs,0,-30) then exit
+parse source . . fp .; df=left(fp,max(lastpos('/',fp),lastpos(':',fp)))
+changewhere "BBSLink Menu"
+/**************************************************************************/
+/*                                                                        */
+/*  C-Net BBSLink Menu                           -X-caliber BBS           */
+/*    Used to add BBSLink games, leaderboards,      bbs.aholix.net:6800   */
+/*    grafitti wall and BBS list to your system                           */
+/*    as easily as adding a single Pfile                                  */
+/*                                                                        */
+/*  Changelog:                                                            */
+/*    v1.0.1 (22 Sep 2019) by k1ds3ns4t10n of -X-caliber BBS              */
+/*                                                                        */
+/*    v1.0.0 (21 Sep 2019) by k1ds3ns4t10n of -X-caliber BBS              */
+/*                                                                        */
+/*  Use at your own risk.                                                 */
+/*                                                                        */
+/*  INSTALATION INSTRUCTIONS:                                             */
+/*                                                                        */
+/*  1) Create a folder called 'BBSLink' in your PFiles: directory, and    */
+/*     copy the files bbslinkmenu, menuGame.ans, and menuScore.ans there. */
+/*                                                                        */
+/*  2) Install bbslinkconnect and any enabled modules (i.e bbslinkwall,   */
+/*     bbslinklist, or bbslinkscore) in the same folder from step 1.      */
+/*     https://aminet.net/package/comm/cnet/bbslinkconnect                */
+/*                                                                        */
+/*     NOTE: By default, all modules are enabled in the "SysOp            */
+/*     Configurable Options" block below.                                 */
+/*                                                                        */
+/*     optional modules:                                                  */
+/*       https://aminet.net/package/comm/cnet/bbslinkwl20                 */
+/*       https://aminet.net/package/comm/cnet/bbslinklist                 */
+/*       https://aminet.net/package/comm/cnet/bbslinkscore                */
+/*                                                                        */
+/*  3) If you haven't already, download http_get from Aminet and install  */
+/*     in C: (needed for bbslinkwall, bbslinklist, and bbslinkscore)      */
+/*     https://aminet.net/package/comm/tcp/http_get                       */
+/*                                                                        */
+/*  4) Customize the Game and Score menus as needed. See "Game Menu       */
+/*     Configuration" and "Score Menu Coniguration" blocks below.         */
+/*                                                                        */
+/*  5) Add this file as an Arexx executable anywhere on your system using */
+/*     the path:                                                          */
+/*                                                                        */
+/*     pfiles:bbslink/bbslinkmenu                                         */
+/*                                                                        */
+/*  6) That's it!                                                         */
+/*                                                                        */
+/**************************************************************************/
+/* SysOp Configurable Options *********************************************/
+
+/* this path must be created manually when installing */
+g.execPath = "Pfiles:bbslink/" /* must end with a trailing slash */
+
+/* bbslink module paths */
+g.gamePath = g.execPath||"bbslinkconnect"
+g.wallPath = g.execPath||"bbslinkwall"
+g.listPath = g.execPath||"bbslinklist"
+g.scorePath= g.execPath||"bbslinkscore"
+
+/* filenames of the ansi menus, these files must be in g.execPath */
+m.game     = "menuGame.ans"
+m.score    = "menuScore.ans"
+
+/* these swtiches (0=off, 1=on) control how the Menu functions */
+g.wall     = 1  /* enable BBSLink Wall module (bbslinkwall) */
+g.list     = 1  /* enable BBSLink List module (bbslinklist) */
+g.score    = 1  /* enable BBSLink Score module (bbslinkscore) */
+g.globalCmd= 1  /* enable global BBS commands: WHo, OLM, ET, EP, EU, O! */
+
+/* ok to change these prompts as needed for your system. feel free
+   to add MCI or ANSI codes as needed */
+cp.pre   = "  " /* will precede the below prompts (whitespace) */
+cp.game  = esc"1;33mBBS"esc"1;37mLink Games> "esc"0;36m"
+cp.score = esc"1;33mBBS"esc"1;37mLink Leaderboards> "esc"0;36m"
+
+/* ok to change this message, feel free to add ANSI or MCI codes */
+s.anyKey = 'Smash any key to continue..'
+
+/* End of SysOp Configurable Options **************************************/
+/**************************************************************************/
+
+/**************************************************************************/
+/* Game Menu Configuration ************************************************/
+/*                                                                        */
+/* You may customize the game menu by editing the menuGame.ans file,      */
+/* and setting the proper game codes in the game.xx list below to match   */
+/* the numbers in your ansi menu.                                         */
+/*                                                                        */
+/* Available game codes:                                                  */
+/*                                                                        */
+/*       lord        Legend of the Red Dragon                             */
+/*       lord2       Legend of the Red Dragon II: New World               */
+/*       mzkl        MZK LORD                                             */
+/*       ooii        Operation: Overkill II                               */
+/*       tw          Trade Wars 2002                                      */
+/*       teos        Planets: The Exploration of Space                    */
+/*       gwar        Global War                                           */
+/*       ggam        Global Backgammon                                    */
+/*       usrp        Usurper                                              */
+/*       bre         Barren Realms Elite                                  */
+/*       falc        Falcon's Eye                                         */
+/*       fhon        Falcon's Honor                                       */
+/*       arcl        The Arcadian Legends                                 */
+/*       dmud        DoorMUD                                              */
+/*       pimp        Pimp Wars                                            */
+/*       luna        Lunatix                                              */
+/*       netr        Netrunner                                            */
+/*       assn        Assassin                                             */
+/*       bbsc        BBS Crash                                            */
+/*       vsys        Virtual Sysop                                        */
+/*       tpit        The Pit                                              */
+/*       bord        Bordello                                             */
+/*       junk        Junkyard                                             */
+/*       mmot        Murder Motel                                         */
+/*       dark        Darklands                                            */
+/*       hack        Hackin' Crackin'                                     */
+/*       mega        Mega Slots                                           */
+/*       fish        Fresh Water Fishing Sim                              */
+/*       lmon        Lemonade                                             */
+/*       dmas        Dungeon Master                                       */
+/*       legn        Legion                                               */
+/*       bcr         Black Country Rock Game Server                       */
+/*                                                                        */
+/**************************************************************************/
+
+game. = "" /* IMPORTANT: leave this as a empty string */
+
+game.1 = "lord"
+game.2 = "lord2"
+game.3 = "mzkl"
+game.4 = "teos"
+game.5 = "ooii"
+game.6 = "tw"
+game.7 = "gwar"
+game.8 = "ggam"
+game.9 = "usrp"
+game.10 = "bre"
+game.11 = "falc"
+game.12 = "fhon"
+game.13 = "arcl"
+game.14 = "dmud"
+game.15 = "pimp"
+game.16 = "luna"
+game.17 = "netr"
+game.18 = "assn"
+game.19 = "bbsc"
+game.20 = "vsys"
+game.21 = "tpit"
+game.22 = "bord"
+game.23 = "junk"
+game.24 = "mmot"
+game.25 = "dark"
+game.26 = "hack"
+game.27 = "mega"
+game.28 = "fish"
+game.29 = "lmon"
+game.30 = "dmas"
+game.31 = "legn"
+
+/* End of Game Menu Configuration *****************************************/
+/**************************************************************************/
+
+/**************************************************************************/
+/* Score Menu Configuration ***********************************************/
+/*                                                                        */
+/* You may customize the score menu by editing the menuScore.ans file,    */
+/* and setting the proper score codes in the score.xx list below to match */
+/* the numbers in your ansi menu.                                         */
+/*                                                                        */
+/* Available score codes:                                                 */
+/*                                                                        */
+/*       lord        Legend of the Red Dragon                             */
+/*       lord2       Legend of the Red Dragon II: New World               */
+/*       mzkl        MZK LORD                                             */
+/*       teos        Planets: The Exploration of Space                    */
+/*       ooii        Operation: Overkill II                               */
+/*       usrpuscr    Usurper User Rankings                                */
+/*       usrptscr    Usurper Team Rankings                                */
+/*       usrppkil    Usurper Player Killers                               */
+/*       usrpmkil    Usurper Monster Killers                              */
+/*       usrpnews    Usurper News                                         */
+/*       bre         Barren Realms Elite                                  */
+/*       bretody     Barren Realms Elite Today's News                     */
+/*       breyest     Barren Realms Elite Yesterday's News                 */
+/*       falc        Falcon's Eye                                         */
+/*       falctody    Falcon's Eye Today's News                            */
+/*       falcyest    Falcon's Eye Yesterday's News                        */
+/*       fhontody    Falcon's Honor Today's News                          */
+/*       fhonyest    Falcon's Honor Yesterday's News                      */
+/*       arcl        The Arcadian Legends                                 */
+/*       arcltody    The Arcadian Legends Today's News                    */
+/*       arclyest    The Arcadian Legends Yesterday's News                */
+/*       netr        Netrunner                                            */
+/*       assn        Assassin                                             */
+/*       bord        Bordello                                             */
+/*       junk        Junkyard                                             */
+/*       mega        Mega Slots                                           */
+/*       fish        Fresh Water Fishing Sim                              */
+/*       lmon        Lemonade                                             */
+/*                                                                        */
+/**************************************************************************/
+
+score. = "" /* IMPORTANT: leave this as an empty string */
+
+score.1 = "lord"
+score.2 = "lord2"
+score.3 = "mzkl"
+score.4 = "teos"
+score.5 = "ooii"
+score.6 = "usrpuscr"
+score.7 = "usrptscr"
+score.8 = "usrppkil"
+score.9 = "usrpmkil"
+score.10 = "usrpnews"
+score.11 = "bre"
+score.12 = "bretody"
+score.13 = "breyest"
+score.14 = "falc"
+score.15 = "falctody"
+score.16 = "falcyest"
+score.17 = "fhontody"
+score.18 = "fhonyest"
+score.19 = "arcl"
+score.20 = "arcltody"
+score.21 = "arclyest"
+score.22 = "netr"
+score.23 = "assassin"
+score.24 = "bord"
+score.25 = "junk"
+score.26 = "mega"
+score.27 = "fish"
+score.28 = "lmon"
+
+/* End of Score Menu Configuration ****************************************/
+/**************************************************************************/
+
+c.err  = esc"0;31m"
+c.blink= esc"5m"
+c.reset= esc"0m"
+
+runWall = ctq"#0"g.wallPath"}"
+runList = ctq"#0"g.listPath"}"
+runGame = ctq"#0"g.gamePath' "GAME_CODE"}' /* do not change GAME_CODE here */
+runScore= ctq"#0"g.scorePath' "SCORE_CODE"}' /* do not change SCORE_CODE here */
+
+gu 40; g.uid = space(result ,0)  /* account id */
+gu 27; g.maxCol=result-1         /* term width */
+
+if ~exists("c:http_get") then signal badHttp
+if ~exists(g.gamePath) then signal badConnect
+if g.wall & ~exists(g.wallPath) then signal badWall
+if g.list & ~exists(g.listPath) then signal badList
+if g.score & ~exists(g.scorePath) then signal badScore
+
+/* game menu */
+game:
+do forever
+  changewhere "BBSLink Menu"
+  cls
+  se ctq"@4}" /* disable more prompt */
+  sendfile g.execPath||m.game
+  se cp.pre
+  prompt 3 normal cp.game
+  cmd = upper(result)
+  call check
+  select
+    when cmd=="Q" then signal exit
+    when g.score & cmd=="L" then signal score
+    when g.wall & cmd=="W" then tr runWall
+    when g.list & index("BBS", cmd)==1 then tr runList
+
+    /* global system commands */
+    when g.globalCmd & index("WHO", cmd)==1 then call who
+    when g.globalCmd & index("OLM", cmd)==1 then bbscommand "OLM"
+    when g.globalCmd & cmd=="ET" then bbscommand "ET"
+    when g.globalCmd & cmd=="EP" then bbscommand "EP"
+    when g.globalCmd & cmd=="EU" then bbscommand "EU"
+    when g.globalCmd & cmd=="O!" then signal offNow
+
+    otherwise do
+      if game.cmd ~= "" then tr replace(runGame, 'GAME_CODE', game.cmd)
+    end
+  end
+end
+
+/* leaderboard menu */
+score:
+do forever
+  changewhere "BBSLink Menu"
+  cls
+  se ctq"@4}" /* disable more? */
+  sendfile g.execPath||m.score
+  se cp.pre
+  prompt 3 normal cp.score
+  cmd = upper(result)
+  call check
+  select
+    when cmd=="Q" then exit
+    when cmd=="G" then signal game
+    when g.wall & cmd=="W" then tr runWall
+    when g.list & index("BBS", cmd)==1 then tr runList
+
+    /* global system commands */
+    when g.globalCmd & index("WHO", cmd)==1 then call who
+    when g.globalCmd & index("OLM", cmd)==1 then bbscommand "OLM"
+    when g.globalCmd & cmd=="ET" then bbscommand "ET"
+    when g.globalCmd & cmd=="EP" then bbscommand "EP"
+    when g.globalCmd & cmd=="EU" then bbscommand "EU"
+    when g.globalCmd & cmd=="O!" then signal offNow
+
+    otherwise do
+      if score.cmd ~= "" then tr replace(runScore, 'SCORE_CODE', score.cmd)
+    end
+  end
+end
+
+EXIT:
+  /* reset ANSI env */
+  se ctq"Q1}"
+  exit
+
+/* Procedures *************************************************************/
+
+who:
+  bbscommand "WH"
+  tr
+  se s.anyKey
+  gc
+  call check
+return
+
+offNow:
+  bbscommand "Off!"
+  addkeys "Q`"
+  exit
+
+/* replace - replace srch text with repl text in text
+      ->replace("astrologer","log","nom")
+      astronomer
+
+   Source: Using Arexx on the Amiga, page 313
+*/
+replace: procedure
+  parse arg text, srch, repl
+  if index(text, srch)==0 then return text
+
+  slen = length(srch)
+  tlen = length(text)
+  do until tlen = 0
+    tlen = lastpos(srch, text, tlen)
+    if tlen ~= 0 then do
+      text = insert(repl, delstr(text,tlen,slen), tlen - 1)
+      tlen = tlen - 1
+    end
+  end
+return text
+
+/* word wraps an input string at a given width and will not split any words
+   @param text  the input string to word wrap
+   @param width the width to wrap at
+
+   results will be placed into an array called resultsArr structured as:
+     resultArr.0 = line count
+     resultArr.1 = line 1 string
+     resultArr.2 = line 2 string
+      .
+      .
+      .
+     resultArr.n = line n string
+*/
+wordWrap: procedure expose resultArr.
+  parse arg text, width
+
+  /* clear any previous data in the results array */
+  drop resultArr.
+
+  /* line count is held at position 0, init it to line 1 */
+  resultArr.0 = 1
+
+  if length(text) <= width then do
+    resultArr.1 = text
+    return
+  end
+
+  line = resultArr.0
+  resultArr.1 = ""
+  do while text ~= ""
+      parse var text word text
+
+      /* check if current line + next word < width */
+      if length(resultArr.line) + length(word) + 1 <= width then do
+          /* add word to current line */
+          if resultArr.line=="" then resultArr.line = word
+          else resultArr.line = resultArr.line" "word
+      end
+      else do
+          /* start new line with with next word */
+          line = line + 1
+          resultArr.line = word
+    end
+  end
+
+  /* store final line count at position 0 of the array */
+  resultArr.0 = line
+return
+
+guruError: procedure expose tr se gc c. g.
+  parse arg errMsg1, errMsg2
+  cls
+  tr c.err
+
+  tr c.blink"Û"copies('ß', g.maxCol-2)"Û"
+
+  call wordWrap(errMsg1, g.maxCol-4)
+  do i=1 to resultArr.0
+    tr c.blink"Û "c.reset||c.err|| center(resultArr.i, g.maxCol-4)||c.blink" Û"
+  end
+
+  call wordWrap(errMsg2, g.maxCol-4)
+  do i=1 to resultArr.0
+    tr c.blink"Û "c.reset||c.err|| center(resultArr.i, g.maxCol-4)||c.blink" Û"
+  end
+
+  tr c.blink"Û"copies('Ü', g.maxCol-2)"Û"c.reset
+  tr
+  se c.err|| center("Press ANY KEY to continue..", g.maxCol)
+  gc
+return
+
+badHttp:
+  errMsg1 = "Could not find http_get! Please re-read the install instructions."
+  errMsg2 = "Guru Meditation #00000000:084DH77P"
+  call guruError(errMsg1, errMsg2)
+  exit
+
+badConnect:
+  errMsg1 = "Could not find bbslinkconnect! Please re-install bbslinkconnect."
+  errMsg2 = "Guru Meditation #00000084:DC0NN3C7"
+  call guruError(errMsg1, errMsg2)
+  exit
+
+badWall:
+  errMsg1 = "Could not find bbslinkwall module! Please install or disable module."
+  errMsg2 = "Guru Meditation #00000000:084DW4LL"
+  call guruError(errMsg1, errMsg2)
+  exit
+
+badList:
+  errMsg1 = "Could not find bbslinklist module! Please install or disable module."
+  errMsg2 = "Guru Meditation #00000000:084DL157"
+  call guruError(errMsg1, errMsg2)
+  exit
+
+badScore:
+  errMsg1 = "Could not find bbslinkscore module! Please install or disable module."
+  errMsg2 = "Guru Meditation #00000000:84D5C0R3"
+  call guruError(errMsg1, errMsg2)
+  exit
+/**************************************************************************/
+
+CHECK:
+  if ARG() & ARG(1)~="###PANIC" then return ARG(1)
+  getcarrier
+  if result="TRUE" then do
+    if ARG() then return ARG(1)
+    else return
+  end
+  logentry "Lost Carrier!!"
+  bufferflush
+  exit
+
+SYNTAX:
+ERROR:
+IOERR:
+  e1="n1 Error: "rc" ("errortext(rc)")"
+  e2="  Line: "left(sigl,4)"File:"
+  c="`"fp", "ver"'"
+  e2=e2" "c
+  tr e1
+  tr e2
+  logentry e1
+  logentry e2
+  e=strip(translate(sourceline(sigl),"\{",""))
+  do while e~=""
+    e3="Source: "left(e,37)
+    tr e3
+    logentry e3
+    e=substr(e,38)
+    end
+  bufferflush
+  exit
+/**************************************************************************\
+\*************************** -X-caliber BBS telnet://bbs.aholix.net:6800 **/
