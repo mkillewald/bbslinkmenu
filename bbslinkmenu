@@ -263,8 +263,8 @@ if g.wall & ~exists(g.wallPath) then signal badWall
 if g.list & ~exists(g.listPath) then signal badList
 if g.score & ~exists(g.scorePath) then signal badScore
 
-m.gameMenuFile = translate(g.gameMenuFile, g.termType, "X")
-m.scoreMenuFile= translate(g.scoreMenuFile, g.termType, "X")
+m.gameMenuFile = translate(m.gameMenuFile, g.termType, "X")
+m.scoreMenuFile= translate(m.scoreMenuFile, g.termType, "X")
 
 /* game menu */
 game:
@@ -303,7 +303,7 @@ do forever
   changewhere "BBSLink Menu"
   cls
   if g.termType ~= 1 then se ctq"@4}" /* disable more prompt */
-  sendfile g.pfilePath||m.score
+  sendfile m.scoreMenuFile
   se cp.pre
   prompt 3 normal cp.score
   cmd = upper(result)
