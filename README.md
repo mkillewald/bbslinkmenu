@@ -1,4 +1,4 @@
-# C-Net BBSLink Menu 1.0.0
+# C-Net BBSLink Menu 1.0.1 (devel version)
 
 A C-Net Pfile used to easily add all BBSLink.net games, leaderboards, grafitti wall and BBS List to your system.
 http://www.bbslink.net/
