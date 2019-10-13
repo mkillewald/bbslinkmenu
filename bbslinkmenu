@@ -25,8 +25,8 @@ changewhere "BBSLink Menu"
 /*                                                                        */
 /*  INSTALATION INSTRUCTIONS:                                             */
 /*                                                                        */
-/*  1) Create a folder called 'BBSLink' in your PFiles: directory, and    */
-/*     copy the files bbslinkmenu, menuGame.ans, and menuScore.ans there. */
+/*  1) Create a folder called 'bbslink' in your PFiles: directory.        */
+/*     Copy this file, tt*.menuGame files, and tt*.menuScore files there. */
 /*                                                                        */
 /*  2) Install bbslinkconnect and any enabled modules (i.e bbslinkwall,   */
 /*     bbslinklist, or bbslinkscore) in the same folder from step 1.      */
@@ -57,32 +57,33 @@ changewhere "BBSLink Menu"
 /**************************************************************************/
 /* SysOp Configurable Options *********************************************/
 
-/* this path must be created manually when installing */
-g.execPath = "Pfiles:bbslink/" /* must end with a trailing slash */
+/* This path should be created manually when installing */
+g.pfilePath = "pfiles:bbslink/" /* must end with a trailing slash */
 
-/* bbslink module paths */
-g.gamePath = g.execPath||"bbslinkconnect"
-g.wallPath = g.execPath||"bbslinkwall"
-g.listPath = g.execPath||"bbslinklist"
-g.scorePath= g.execPath||"bbslinkscore"
+/* BBSLink module paths */
+g.gamePath      = g.pfilePath||"bbslinkconnect"
+g.wallPath      = g.pfilePath||"bbslinkwall"
+g.listPath      = g.pfilePath||"bbslinklist"
+g.scorePath     = g.pfilePath||"bbslinkscore"
 
-/* filenames of the ansi menus, these files must be in g.execPath */
-m.game     = "menuGame.ans"
-m.score    = "menuScore.ans"
+/* The X in the below filenames will be automatically replaced by the users
+   chosen terminal type, do not hard set any terminal types here. */
+m.gameMenuFile  = g.pfilePath||"ttX.menuGame"
+m.scoreMenuFile = g.pfilePath||"ttX.menuScore"
 
-/* these swtiches (0=off, 1=on) control how the Menu functions */
-g.wall     = 1  /* enable BBSLink Wall module (bbslinkwall) */
-g.list     = 1  /* enable BBSLink List module (bbslinklist) */
-g.score    = 1  /* enable BBSLink Score module (bbslinkscore) */
-g.globalCmd= 1  /* enable global BBS commands: WHo, OLM, ET, EP, EU, O! */
+/* These swtiches (0=off, 1=on) control how the Menu functions */
+g.wall          = 1  /* enable BBSLink Wall module (bbslinkwall) */
+g.list          = 1  /* enable BBSLink List module (bbslinklist) */
+g.score         = 1  /* enable BBSLink Score module (bbslinkscore) */
+g.globalCmd     = 1  /* enable global BBS commands: WHo, OLM, ET, EP, EU, O! */
 
-/* ok to change these prompts as needed for your system. feel free
+/* Ok to change these prompts as needed for your system. feel free
    to add MCI or ANSI codes as needed */
 cp.pre   = "  " /* will precede the below prompts (whitespace) */
 cp.game  = esc"1;33mBBS"esc"1;37mLink Games> "esc"0;36m"
 cp.score = esc"1;33mBBS"esc"1;37mLink Leaderboards> "esc"0;36m"
 
-/* ok to change this message, feel free to add ANSI or MCI codes */
+/* Ok to change this message, feel free to add ANSI or MCI codes */
 s.anyKey = 'Smash any key to continue..'
 
 /* End of SysOp Configurable Options **************************************/
@@ -254,6 +255,7 @@ runScore= ctq"#0"g.scorePath' "SCORE_CODE"}' /* do not change SCORE_CODE here */
 
 gu 40; g.uid = space(result ,0)  /* account id */
 gu 27; g.maxCol=result-1         /* term width */
+gu 28; g.termType=result         /* term type  */
 
 if ~exists("c:http_get") then signal badHttp
 if ~exists(g.gamePath) then signal badConnect
@@ -261,13 +263,16 @@ if g.wall & ~exists(g.wallPath) then signal badWall
 if g.list & ~exists(g.listPath) then signal badList
 if g.score & ~exists(g.scorePath) then signal badScore
 
+m.gameMenuFile = translate(g.gameMenuFile, g.termType, "X")
+m.scoreMenuFile= translate(g.scoreMenuFile, g.termType, "X")
+
 /* game menu */
 game:
 do forever
   changewhere "BBSLink Menu"
   cls
-  se ctq"@4}" /* disable more prompt */
-  sendfile g.execPath||m.game
+  if g.termType ~= 1 then se ctq"@4}" /* disable more prompt */
+  sendfile m.gameMenuFile
   se cp.pre
   prompt 3 normal cp.game
   cmd = upper(result)
@@ -297,8 +302,8 @@ score:
 do forever
   changewhere "BBSLink Menu"
   cls
-  se ctq"@4}" /* disable more? */
-  sendfile g.execPath||m.score
+  if g.termType ~= 1 then se ctq"@4}" /* disable more prompt */
+  sendfile g.pfilePath||m.score
   se cp.pre
   prompt 3 normal cp.score
   cmd = upper(result)
