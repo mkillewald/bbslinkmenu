@@ -492,13 +492,10 @@ IOERR:
   e2=e2" "c
   tr e1
   tr e2
-  logentry e1
-  logentry e2
   e=strip(translate(sourceline(sigl),"\{",""))
   do while e~=""
     e3="Source: "left(e,37)
     tr e3
-    logentry e3
     e=substr(e,38)
     end
   bufferflush
