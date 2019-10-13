@@ -1,3 +1,7 @@
+### NOTE: This is an unstable development branch which has not yet been released, and is not guaranteed to work. Do not use this version, you have been warned. 
+
+### For the stable release verision, return to branch [master](https://github.com/mkillewald/bbslinkmenu/tree/master), or download the [latest release](https://github.com/mkillewald/bbslinkmenu/releases/latest)
+
 # C-Net BBSLink Menu 1.0.1 (devel version)
 
 A C-Net Pfile used to easily add all BBSLink.net games, leaderboards, grafitti wall and BBS List to your system.
