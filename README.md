@@ -43,7 +43,7 @@ Configuration" and "Score Menu Coniguration" blocks.
 5. Add this file as an Arexx executable anywhere on your system using
 the path:
 
-pfiles:bbslink/bbslinkmenu
+   pfiles:bbslink/bbslinkmenu
 
 6. That's it!
 
