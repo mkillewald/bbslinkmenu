@@ -1,5 +1,5 @@
 /**************************************************************************\
-$VER: BBSLink Menu, v1.0.1 (Sep-22-2019) by k1ds3ns4t10n of -X-caliber BBS
+$VER: BBSLink Menu, v1.0.2 (May-17-2020) by k1ds3ns4t10n of -X-caliber BBS
 \**************************************************************************/
 options results;signal on SYNTAX;signal on ERROR;signal on IOERR
 a=sourceline(2);parse var a . " " title ", " ver " (" vdate ") by " author " " .
@@ -17,6 +17,9 @@ changewhere "BBSLink Menu"
 /*    as easily as adding a single Pfile                                  */
 /*                                                                        */
 /*  Changelog:                                                            */
+/*    v1.0.2 (17 May 2020) by k1ds3ns4t10n of -X-caliber BBS              */
+/*     - added Darknesss 2.0 to game and score lists                      */
+/*                                                                        */
 /*    v1.0.1 (22 Sep 2019) by k1ds3ns4t10n of -X-caliber BBS              */
 /*                                                                        */
 /*    v1.0.0 (21 Sep 2019) by k1ds3ns4t10n of -X-caliber BBS              */
@@ -46,6 +49,14 @@ changewhere "BBSLink Menu"
 /*                                                                        */
 /*  4) Customize the Game and Score menus as needed. See "Game Menu       */
 /*     Configuration" and "Score Menu Coniguration" blocks below.         */
+/*                                                                        */
+/*     You will also want to modify the tt*.menuGame and tt*.menuScore    */
+/*     files to display as appropriate. Use a text editor or remove any   */
+/*     SAUCE info added by your ANSI editor.                              */
+/*                                                                        */
+/*     PRO TIP: incluce a "esc[1A" sequence at the start of the first     */
+/*     of the tt*.menuGame and tt*.menuScore files to remove a blank line */
+/*     that will appear at the top of the screen.                         */
 /*                                                                        */
 /*  5) Add this file as an Arexx executable anywhere on your system using */
 /*     the path:                                                          */
@@ -130,6 +141,7 @@ s.anyKey = 'Smash any key to continue..'
 /*       dmas        Dungeon Master                                       */
 /*       legn        Legion                                               */
 /*       bcr         Black Country Rock Game Server                       */
+/*       dkns        Darkness 2.0                                         */
 /*                                                                        */
 /**************************************************************************/
 
@@ -166,6 +178,7 @@ game.28 = "fish"
 game.29 = "lmon"
 game.30 = "dmas"
 game.31 = "legn"
+game.32 = "dkns"
 
 /* End of Game Menu Configuration *****************************************/
 /**************************************************************************/
@@ -207,6 +220,7 @@ game.31 = "legn"
 /*       mega        Mega Slots                                           */
 /*       fish        Fresh Water Fishing Sim                              */
 /*       lmon        Lemonade                                             */
+/*       dkns        Darkness 2.0                                         */
 /*                                                                        */
 /**************************************************************************/
 
@@ -240,6 +254,7 @@ score.25 = "junk"
 score.26 = "mega"
 score.27 = "fish"
 score.28 = "lmon"
+score.29 = "dkns"
 
 /* End of Score Menu Configuration ****************************************/
 /**************************************************************************/

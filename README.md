@@ -1,8 +1,8 @@
-### NOTE: This is an unstable development branch which has not yet been released, and is not guaranteed to work. Do not use this version, you have been warned. 
+### NOTE: This is an unstable development branch which has not yet been released, and is not guaranteed to work. Do not use this version, you have been warned.
 
 ### For the stable release verision, return to branch [master](https://github.com/mkillewald/bbslinkmenu/tree/master), or download the [latest release](https://github.com/mkillewald/bbslinkmenu/releases/latest)
 
-# C-Net BBSLink Menu 1.0.1 (devel version)
+# C-Net BBSLink Menu 1.0.2 (devel version)
 
 A C-Net Pfile used to easily add all BBSLink.net games, leaderboards, grafitti wall and BBS List to your system.
 http://www.bbslink.net/
@@ -10,6 +10,11 @@ http://www.bbslink.net/
 **************************************************************************
 
 ### Changelog
+
+v1.0.2 (17 May 2020) by k1ds3ns4t10n of -X-caliber BBS
+ - added Darknesss 2.0 to game and score lists
+
+v1.0.1 (22 Sep 2019) by k1ds3ns4t10n of -X-caliber BBS
 
 v1.0.0 (21 Sep 2019) by k1ds3ns4t10n of -X-caliber BBS
 
