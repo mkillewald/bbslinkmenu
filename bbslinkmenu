@@ -1,5 +1,5 @@
 /**************************************************************************\
-$VER: BBSLink Menu, v1.0.0 (Sep-21-2019) by k1ds3ns4t10n of -X-caliber BBS
+$VER: BBSLink Menu, v1.0.2 (May-17-2020) by k1ds3ns4t10n of -X-caliber BBS
 \**************************************************************************/
 options results;signal on SYNTAX;signal on ERROR;signal on IOERR
 a=sourceline(2);parse var a . " " title ", " ver " (" vdate ") by " author " " .
@@ -13,18 +13,23 @@ changewhere "BBSLink Menu"
 /*                                                                        */
 /*  C-Net BBSLink Menu                           -X-caliber BBS           */
 /*    Used to add BBSLink games, leaderboards,      bbs.aholix.net:6800   */
-/*    grafitti wall and BBS list to your system                           */
+/*    graffiti wall and BBS list to your system                           */
 /*    as easily as adding a single Pfile                                  */
 /*                                                                        */
 /*  Changelog:                                                            */
+/*    v1.0.2 (17 May 2020) by k1ds3ns4t10n of -X-caliber BBS              */
+/*     - added Darknesss 2.0 to game and score lists                      */
+/*                                                                        */
+/*    v1.0.1 (22 Sep 2019) by k1ds3ns4t10n of -X-caliber BBS              */
+/*                                                                        */
 /*    v1.0.0 (21 Sep 2019) by k1ds3ns4t10n of -X-caliber BBS              */
 /*                                                                        */
 /*  Use at your own risk.                                                 */
 /*                                                                        */
 /*  INSTALATION INSTRUCTIONS:                                             */
 /*                                                                        */
-/*  1) Create a folder called 'BBSLink' in your PFiles: directory, and    */
-/*     copy the files bbslinkmenu, menuGame.ans, and menuScore.ans there. */
+/*  1) Create a folder called 'bbslink' in your PFiles: directory.        */
+/*     Copy this file, tt*.menuGame files, and tt*.menuScore files there. */
 /*                                                                        */
 /*  2) Install bbslinkconnect and any enabled modules (i.e bbslinkwall,   */
 /*     bbslinklist, or bbslinkscore) in the same folder from step 1.      */
@@ -45,6 +50,14 @@ changewhere "BBSLink Menu"
 /*  4) Customize the Game and Score menus as needed. See "Game Menu       */
 /*     Configuration" and "Score Menu Coniguration" blocks below.         */
 /*                                                                        */
+/*     You will also want to modify the tt*.menuGame and tt*.menuScore    */
+/*     files to display as appropriate. Use a text editor or remove any   */
+/*     SAUCE info added by your ANSI editor.                              */
+/*                                                                        */
+/*     PRO TIP: incluce a "esc[1A" sequence at the start of the first     */
+/*     of the tt*.menuGame and tt*.menuScore files to remove a blank line */
+/*     that will appear at the top of the screen.                         */
+/*                                                                        */
 /*  5) Add this file as an Arexx executable anywhere on your system using */
 /*     the path:                                                          */
 /*                                                                        */
@@ -55,42 +68,40 @@ changewhere "BBSLink Menu"
 /**************************************************************************/
 /* SysOp Configurable Options *********************************************/
 
-/* this path must be created manually when installing */
-g.execPath = "Pfiles:bbslink/" /* must end with a trailing slash */
+/* This path should be created manually when installing */
+g.pfilePath = "pfiles:bbslink/" /* must end with a trailing slash */
 
-/* bbslink module paths */
-g.gamePath = g.execPath||"bbslinkconnect"
-g.wallPath = g.execPath||"bbslinkwall"
-g.listPath = g.execPath||"bbslinklist"
-g.scorePath= g.execPath||"bbslinkscore"
+/* BBSLink module paths */
+g.gamePath      = g.pfilePath||"bbslinkconnect"
+g.wallPath      = g.pfilePath||"bbslinkwall"
+g.listPath      = g.pfilePath||"bbslinklist"
+g.scorePath     = g.pfilePath||"bbslinkscore"
 
-/* filenames of the ansi menus, these files must be in g.execPath */
-m.game     = "menuGame.ans"
-m.score    = "menuScore.ans"
+/* The X in the below filenames will be automatically replaced by the users
+   chosen terminal type, do not hard set any terminal types here. */
+m.gameMenuFile  = g.pfilePath||"ttX.menuGame"
+m.scoreMenuFile = g.pfilePath||"ttX.menuScore"
 
-/* these swtiches (0=off, 1=on) control how the Menu functions */
-g.wall     = 1  /* enable BBSLink Wall module (bbslinkwall) */
-g.list     = 1  /* enable BBSLink List module (bbslinklist) */
-g.score    = 1  /* enable BBSLink Score module (bbslinkscore) */
-g.globalCmd= 1  /* enable global BBS commands: WHo, OLM, ET, EP, EU, O! */
+/* These swtiches (0=off, 1=on) control how the Menu functions */
+g.wall          = 1  /* enable BBSLink Wall module (bbslinkwall) */
+g.list          = 1  /* enable BBSLink List module (bbslinklist) */
+g.score         = 1  /* enable BBSLink Score module (bbslinkscore) */
+g.globalCmd     = 1  /* enable global BBS commands: WHo, OLM, ET, EP, EU, O! */
 
-/* ok to change these prompts as needed for your system. feel free
+/* Ok to change these prompts as needed for your system. feel free
    to add MCI or ANSI codes as needed */
 cp.pre   = "  " /* will precede the below prompts (whitespace) */
 cp.game  = esc"1;33mBBS"esc"1;37mLink Games> "esc"0;36m"
 cp.score = esc"1;33mBBS"esc"1;37mLink Leaderboards> "esc"0;36m"
 
-/* ok to change this message, feel free to add MCI or ANSI codes as
-   needed  */
+/* Ok to change this message, feel free to add ANSI or MCI codes */
 s.anyKey = 'Smash any key to continue..'
 
 /* End of SysOp Configurable Options **************************************/
 /**************************************************************************/
 
-/* Game Menu Configuration ************************************************/
 /**************************************************************************/
-/*                                                                        */
-/* GAME MENU CUSTOMIZATION:                                               */
+/* Game Menu Configuration ************************************************/
 /*                                                                        */
 /* You may customize the game menu by editing the menuGame.ans file,      */
 /* and setting the proper game codes in the game.xx list below to match   */
@@ -98,37 +109,41 @@ s.anyKey = 'Smash any key to continue..'
 /*                                                                        */
 /* Available game codes:                                                  */
 /*                                                                        */
-/*      Game code: lord        Legend of the Red Dragon                   */
-/*      Game code: lord2       Legend of the Red Dragon II: New World     */
-/*      Game code: mzkl        MZK LORD                                   */
-/*      Game code: ooii        Operation: Overkill II                     */
-/*      Game code: tw          Trade Wars 2002                            */
-/*      Game code: teos        Planets: The Exploration of Space          */
-/*      Game code: gwar        Global War                                 */
-/*      Game code: ggam        Global Backgammon                          */
-/*      Game code: usrp        Usurper                                    */
-/*      Game code: bre         Barren Realms Elite                        */
-/*      Game code: falc        Falcon's Eye                               */
-/*      Game code: fhon        Falcon's Honor                             */
-/*      Game code: arcl        The Arcadian Legends                       */
-/*      Game code: dmud        DoorMUD                                    */
-/*      Game code: pimp        Pimp Wars                                  */
-/*      Game code: luna        Lunatix                                    */
-/*      Game code: netr        Netrunner                                  */
-/*      Game code: assn        Assassin                                   */
-/*      Game code: bbsc        BBS Crash                                  */
-/*      Game code: vsys        Virtual Sysop                              */
-/*      Game code: tpit        The Pit                                    */
-/*      Game code: bord        Bordello                                   */
-/*      Game code: junk        Junkyard                                   */
-/*      Game code: mmot        Murder Motel                               */
-/*      Game code: dark        Darklands                                  */
-/*      Game code: hack        Hackin' Crackin'                           */
-/*      Game code: mega        Mega Slots                                 */
-/*      Game code: fish        Fresh Water Fishing Sim                    */
-/*      Game code: lmon        Lemonade                                   */
-/*      Game code: dmas        Dungeon Master                             */
-/*      Game code: legn        Legion                                     */
+/*       lord        Legend of the Red Dragon                             */
+/*       lord2       Legend of the Red Dragon II: New World               */
+/*       mzkl        MZK LORD                                             */
+/*       ooii        Operation: Overkill II                               */
+/*       tw          Trade Wars 2002                                      */
+/*       teos        Planets: The Exploration of Space                    */
+/*       gwar        Global War                                           */
+/*       ggam        Global Backgammon                                    */
+/*       usrp        Usurper                                              */
+/*       bre         Barren Realms Elite                                  */
+/*       falc        Falcon's Eye                                         */
+/*       fhon        Falcon's Honor                                       */
+/*       arcl        The Arcadian Legends                                 */
+/*       dmud        DoorMUD                                              */
+/*       pimp        Pimp Wars                                            */
+/*       luna        Lunatix                                              */
+/*       netr        Netrunner                                            */
+/*       assn        Assassin                                             */
+/*       bbsc        BBS Crash                                            */
+/*       vsys        Virtual Sysop                                        */
+/*       tpit        The Pit                                              */
+/*       bord        Bordello                                             */
+/*       junk        Junkyard                                             */
+/*       mmot        Murder Motel                                         */
+/*       dark        Darklands                                            */
+/*       hack        Hackin' Crackin'                                     */
+/*       mega        Mega Slots                                           */
+/*       fish        Fresh Water Fishing Sim                              */
+/*       lmon        Lemonade                                             */
+/*       dmas        Dungeon Master                                       */
+/*       legn        Legion                                               */
+/*       bcr         Black Country Rock Game Server                       */
+/*       dkns        Darkness 2.0                                         */
+/*                                                                        */
+/**************************************************************************/
 
 game. = "" /* IMPORTANT: leave this as a empty string */
 
@@ -163,14 +178,13 @@ game.28 = "fish"
 game.29 = "lmon"
 game.30 = "dmas"
 game.31 = "legn"
+game.32 = "dkns"
 
 /* End of Game Menu Configuration *****************************************/
 /**************************************************************************/
 
-/* Score Menu Configuration ***********************************************/
 /**************************************************************************/
-/*                                                                        */
-/* SCORE MENU CUSTOMIZATION:                                              */
+/* Score Menu Configuration ***********************************************/
 /*                                                                        */
 /* You may customize the score menu by editing the menuScore.ans file,    */
 /* and setting the proper score codes in the score.xx list below to match */
@@ -178,34 +192,37 @@ game.31 = "legn"
 /*                                                                        */
 /* Available score codes:                                                 */
 /*                                                                        */
-/*      Score code: lord       Legend of the Red Dragon                   */
-/*      Score code: lord2      Legend of the Red Dragon II: New World     */
-/*      Score code: mzkl       MZK LORD                                   */
-/*      Score code: teos       Planets: The Exploration of Space          */
-/*      Score code: ooii       Operation: Overkill II                     */
-/*      Score code: usrpuscr   Usurper User Rankings                      */
-/*      Score code: usrptscr   Usurper Team Rankings                      */
-/*      Score code: usrppkil   Usurper Player Killers                     */
-/*      Score code: usrpmkil   Usurper Monster Killers                    */
-/*      Score code: usrpnews   Usurper News                               */
-/*      Score code: bre        Barren Realms Elite                        */
-/*      Score code: bretody    Barren Realms Elite Today's News           */
-/*      Score code: breyest    Barren Realms Elite Yesterday's News       */
-/*      Score code: falc       Falcon's Eye                               */
-/*      Score code: falctody   Falcon's Eye Today's News                  */
-/*      Score code: falcyest   Falcon's Eye Yesterday's News              */
-/*      Score code: fhontody   Falcon's Honor Today's News                */
-/*      Score code: fhonyest   Falcon's Honor Yesterday's News            */
-/*      Score code: arcl       The Arcadian Legends                       */
-/*      Score code: arcltody   The Arcadian Legends Today's News          */
-/*      Score code: arclyest   The Arcadian Legends Yesterday's News      */
-/*      Score code: netr       Netrunner                                  */
-/*      Score code: assn       Assassin                                   */
-/*      Score code: bord       Bordello                                   */
-/*      Score code: junk       Junkyard                                   */
-/*      Score code: mega       Mega Slots                                 */
-/*      Score code: fish       Fresh Water Fishing Sim                    */
-/*      Score code: lmon       Lemonade                                   */
+/*       lord        Legend of the Red Dragon                             */
+/*       lord2       Legend of the Red Dragon II: New World               */
+/*       mzkl        MZK LORD                                             */
+/*       teos        Planets: The Exploration of Space                    */
+/*       ooii        Operation: Overkill II                               */
+/*       usrpuscr    Usurper User Rankings                                */
+/*       usrptscr    Usurper Team Rankings                                */
+/*       usrppkil    Usurper Player Killers                               */
+/*       usrpmkil    Usurper Monster Killers                              */
+/*       usrpnews    Usurper News                                         */
+/*       bre         Barren Realms Elite                                  */
+/*       bretody     Barren Realms Elite Today's News                     */
+/*       breyest     Barren Realms Elite Yesterday's News                 */
+/*       falc        Falcon's Eye                                         */
+/*       falctody    Falcon's Eye Today's News                            */
+/*       falcyest    Falcon's Eye Yesterday's News                        */
+/*       fhontody    Falcon's Honor Today's News                          */
+/*       fhonyest    Falcon's Honor Yesterday's News                      */
+/*       arcl        The Arcadian Legends                                 */
+/*       arcltody    The Arcadian Legends Today's News                    */
+/*       arclyest    The Arcadian Legends Yesterday's News                */
+/*       netr        Netrunner                                            */
+/*       assn        Assassin                                             */
+/*       bord        Bordello                                             */
+/*       junk        Junkyard                                             */
+/*       mega        Mega Slots                                           */
+/*       fish        Fresh Water Fishing Sim                              */
+/*       lmon        Lemonade                                             */
+/*       dkns        Darkness 2.0                                         */
+/*                                                                        */
+/**************************************************************************/
 
 score. = "" /* IMPORTANT: leave this as an empty string */
 
@@ -237,6 +254,7 @@ score.25 = "junk"
 score.26 = "mega"
 score.27 = "fish"
 score.28 = "lmon"
+score.29 = "dkns"
 
 /* End of Score Menu Configuration ****************************************/
 /**************************************************************************/
@@ -252,6 +270,7 @@ runScore= ctq"#0"g.scorePath' "SCORE_CODE"}' /* do not change SCORE_CODE here */
 
 gu 40; g.uid = space(result ,0)  /* account id */
 gu 27; g.maxCol=result-1         /* term width */
+gu 28; g.termType=result         /* term type  */
 
 if ~exists("c:http_get") then signal badHttp
 if ~exists(g.gamePath) then signal badConnect
@@ -259,13 +278,16 @@ if g.wall & ~exists(g.wallPath) then signal badWall
 if g.list & ~exists(g.listPath) then signal badList
 if g.score & ~exists(g.scorePath) then signal badScore
 
+m.gameMenuFile = translate(m.gameMenuFile, g.termType, "X")
+m.scoreMenuFile= translate(m.scoreMenuFile, g.termType, "X")
+
 /* game menu */
 game:
 do forever
   changewhere "BBSLink Menu"
   cls
-  se ctq"@4}" /* disable more prompt */
-  sendfile g.execPath||m.game
+  if g.termType ~= 1 then se ctq"@4}" /* disable more prompt */
+  sendfile m.gameMenuFile
   se cp.pre
   prompt 3 normal cp.game
   cmd = upper(result)
@@ -295,8 +317,8 @@ score:
 do forever
   changewhere "BBSLink Menu"
   cls
-  se ctq"@4}" /* disable more? */
-  sendfile g.execPath||m.score
+  if g.termType ~= 1 then se ctq"@4}" /* disable more prompt */
+  sendfile m.scoreMenuFile
   se cp.pre
   prompt 3 normal cp.score
   cmd = upper(result)
@@ -464,37 +486,13 @@ badScore:
   call guruError(errMsg1, errMsg2)
   exit
 /**************************************************************************/
-
-CHECK:
-  if ARG() & ARG(1)~="###PANIC" then return ARG(1)
-  getcarrier
-  if result="TRUE" then do
-    if ARG() then return ARG(1)
-    else return
-  end
-  logentry "Lost Carrier!!"
+CHECK:;if ARG() & ARG(1)~="###PANIC" then return ARG(1)
+  getcarrier;if result="TRUE" then if ARG() then return ARG(1);else return
+  logentry "Lost Carrier!!";bufferflush;exit
+SYNTAX:;ERROR:;IOERR:;e1="n1 Error: "rc" ("errortext(rc)")"
+  e2="  Line: "left(sigl,4)"File:";c="`"fp", "ver"'";e2=e2" "c;tr e1;tr e2
+  logentry e1;logentry e2;e=strip(translate(sourceline(sigl),"\{",""))
+  do while e~="";e3="Source: "left(e,37);tr e3;logentry e3;e=substr(e,38);end
   bufferflush
-  exit
-
-SYNTAX:
-ERROR:
-IOERR:
-  e1="n1 Error: "rc" ("errortext(rc)")"
-  e2="  Line: "left(sigl,4)"File:"
-  c="`"fp", "ver"'"
-  e2=e2" "c
-  tr e1
-  tr e2
-  logentry e1
-  logentry e2
-  e=strip(translate(sourceline(sigl),"\{",""))
-  do while e~=""
-    e3="Source: "left(e,37)
-    tr e3
-    logentry e3
-    e=substr(e,38)
-    end
-  bufferflush
-  exit
 /**************************************************************************\
 \*************************** -X-caliber BBS telnet://bbs.aholix.net:6800 **/

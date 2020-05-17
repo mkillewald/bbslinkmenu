@@ -1,4 +1,4 @@
-# C-Net BBSLink Menu 1.0.0
+# C-Net BBSLink Menu 1.0.2
 
 A C-Net Pfile used to easily add all BBSLink.net games, leaderboards, grafitti wall and BBS List to your system.
 http://www.bbslink.net/
@@ -6,6 +6,11 @@ http://www.bbslink.net/
 **************************************************************************
 
 ### Changelog
+
+v1.0.2 (17 May 2020) by k1ds3ns4t10n of -X-caliber BBS
+ - added Darknesss 2.0 to game and score lists
+
+v1.0.1 (22 Sep 2019) by k1ds3ns4t10n of -X-caliber BBS
 
 v1.0.0 (21 Sep 2019) by k1ds3ns4t10n of -X-caliber BBS
 
@@ -35,6 +40,14 @@ https://aminet.net/package/comm/tcp/http_get
 
 4. Customize the Game and Score menus as needed. See "Game Menu
 Configuration" and "Score Menu Coniguration" blocks.
+
+You will also want to modify the tt*.menuGame and tt*.menuScore
+files to display as appropriate. Use a text editor or remove any
+SAUCE info added by your ANSI editor.
+
+PRO TIP: incluce a "esc[1A" sequence at the start of the first
+of the tt*.menuGame and tt*.menuScore files to remove a blank line
+that will appear at the top of the screen.
 
 5. Add this file as an Arexx executable anywhere on your system using
 the path:
