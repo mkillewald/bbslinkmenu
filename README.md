@@ -26,13 +26,13 @@ copy the files bbslinkmenu, menuGame.ans, and menuScore.ans there.
 bbslinklist, or bbslinkscore) in the same folder from step 1.
 https://aminet.net/package/comm/cnet/bbslinkconnect
 
-NOTE: By default, all modules are enabled in the "SysOp
+   NOTE: By default, all modules are enabled in the "SysOp
 Configurable Options" block.
 
-optional modules:
-  https://aminet.net/package/comm/cnet/bbslinkwl20
-  https://aminet.net/package/comm/cnet/bbslinklist
-  https://aminet.net/package/comm/cnet/bbslinkscore
+   optional modules:   
+  https://aminet.net/package/comm/cnet/bbslinkwl20   
+  https://aminet.net/package/comm/cnet/bbslinklist   
+  https://aminet.net/package/comm/cnet/bbslinkscore  
 
 3. If you haven't already, download http_get from Aminet and install
 in C: (needed for bbslinkwall, bbslinklist, and bbslinkscore)
