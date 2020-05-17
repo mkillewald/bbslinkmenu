@@ -41,11 +41,11 @@ https://aminet.net/package/comm/tcp/http_get
 4. Customize the Game and Score menus as needed. See "Game Menu
 Configuration" and "Score Menu Coniguration" blocks.
 
-* You will also want to modify the tt*.menuGame and tt*.menuScore
+   You will also want to modify the tt*.menuGame and tt*.menuScore
 files to display as appropriate. Use a text editor or remove any
 SAUCE info added by your ANSI editor.
 
-* PRO TIP: incluce a "esc[1A" sequence at the start of the first
+   PRO TIP: incluce a "esc[1A" sequence at the start of the first
 of the tt*.menuGame and tt*.menuScore files to remove a blank line
 that will appear at the top of the screen.
 
